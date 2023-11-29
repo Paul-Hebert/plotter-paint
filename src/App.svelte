@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { spline } from '@georgedoescode/spline'
+  import { spline } from "@georgedoescode/spline";
   let svgCanvas;
 
   let strokes = [];
@@ -11,11 +11,12 @@
     isDrawing = true;
     pointsInCurrentStroke.push(getClickOnSvg(e));
 
-    strokes.push({
-      points: pointsInCurrentStroke,
-    });
-
-    console.log(strokes);
+    strokes = [
+      ...strokes,
+      {
+        points: pointsInCurrentStroke,
+      },
+    ];
   }
 
   function handlePointerMove(e) {
@@ -27,10 +28,8 @@
       animationFrame = requestAnimationFrame(() => {
         pointsInCurrentStroke.push(getClickOnSvg(e));
 
-        strokes.pop()
-        strokes = [...strokes, {points: pointsInCurrentStroke}]
-
-        console.log(strokes);
+        strokes.pop();
+        strokes = [...strokes, { points: pointsInCurrentStroke }];
       });
     }
   }
@@ -44,33 +43,31 @@
     pointsInCurrentStroke = [];
   }
 
-  function getClickOnSvg({clientX, clientY}) {
-    let pt = DOMPoint.fromPoint(svgCanvas); 
+  function getClickOnSvg({ clientX, clientY }) {
+    let pt = DOMPoint.fromPoint(svgCanvas);
     pt.x = clientX;
     pt.y = clientY;
 
-
     // The cursor point, translated into svg coordinates
-    return  pt.matrixTransform(svgCanvas.getScreenCTM().inverse());
+    return pt.matrixTransform(svgCanvas.getScreenCTM().inverse());
   }
-
 </script>
 
 <main>
-  <svg 
-    viewBox="0 0 500 500" 
-    on:pointerdown={handlePointerDown} 
-    on:pointermove={handlePointerMove} 
-    on:pointerup={handlePointerUp} 
+  <svg
+    viewBox="0 0 500 500"
+    on:pointerdown={handlePointerDown}
+    on:pointermove={handlePointerMove}
+    on:pointerup={handlePointerUp}
     bind:this={svgCanvas}
   >
     {#each strokes as { points }}
-      <path d="{spline(points)}"/> 
+      <path d={spline(points)} />
     {/each}
   </svg>
 </main>
 
-<style>  
+<style>
   svg {
     background: #fff;
     border: 1px solid #ccc;
@@ -82,5 +79,6 @@
     fill: none;
     stroke: #000;
     stroke-width: 5;
+    stroke-linecap: round;
   }
 </style>
