@@ -1,44 +1,42 @@
 <script lang="ts">
+  import { stateStack } from "../state-stack";
   import { spline } from "@georgedoescode/spline";
+
+  export let strokes;
 
   let svgElement;
 
-  let strokes = [];
   let isDrawing = false;
   let pointsInCurrentStroke = [];
   let animationFrame;
 
   function handlePointerDown(e) {
     isDrawing = true;
-    pointsInCurrentStroke.push(getClickOnSvg(e));
-
-    strokes = [
-      ...strokes,
-      {
-        points: pointsInCurrentStroke,
-      },
-    ];
+    pointsInCurrentStroke = [getClickOnSvg(e)];
   }
 
   function handlePointerMove(e) {
-    if (isDrawing) {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
+    if (!isDrawing) return;
 
-      animationFrame = requestAnimationFrame(() => {
-        pointsInCurrentStroke.push(getClickOnSvg(e));
-
-        strokes.pop();
-        strokes = [...strokes, { points: pointsInCurrentStroke }];
-      });
-    }
-  }
-
-  function endStroke() {
     if (animationFrame) {
       cancelAnimationFrame(animationFrame);
     }
+
+    animationFrame = requestAnimationFrame(() => {
+      pointsInCurrentStroke = [...pointsInCurrentStroke, getClickOnSvg(e)];
+    });
+  }
+
+  function endStroke() {
+    if (!isDrawing) return;
+
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+    }
+
+    stateStack.push({
+      strokes: [...strokes, [...pointsInCurrentStroke]],
+    });
 
     isDrawing = false;
     pointsInCurrentStroke = [];
@@ -57,14 +55,18 @@
 <svelte:document
   on:pointerup={endStroke}
   on:pointerleave={endStroke}
-  on:pointerdown={handlePointerDown}
   on:pointermove={handlePointerMove}
 />
 
-<svg viewBox="0 0 500 500" bind:this={svgElement}>
-  {#each strokes as { points }}
+<svg
+  viewBox="0 0 500 500"
+  bind:this={svgElement}
+  on:pointerdown={handlePointerDown}
+>
+  {#each strokes as points}
     <path d={spline(points)} />
   {/each}
+  <path d={spline(pointsInCurrentStroke)} />
 </svg>
 
 <style>
