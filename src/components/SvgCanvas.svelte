@@ -1,6 +1,7 @@
 <script lang="ts">
   import { stateStack } from "../state-stack";
   import { spline } from "@georgedoescode/spline";
+  import DownloadButton from "./DownloadButton.svelte";
 
   export let strokes;
 
@@ -68,6 +69,8 @@
   {/each}
   <path d={spline(pointsInCurrentStroke)} />
 </svg>
+
+<DownloadButton {svgElement} />
 
 <style>
   svg {

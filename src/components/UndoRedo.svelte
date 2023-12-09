@@ -16,7 +16,7 @@
   }
 </script>
 
-<svelte:document on:keydown={handleKeyup} />
+<svelte:document on:keydown={handleKeydown} />
 
 <div class="undo-redo">
   <button disabled={$stateStack.first} on:click={() => stateStack.undo()}>
