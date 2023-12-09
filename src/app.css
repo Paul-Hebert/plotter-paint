@@ -4,7 +4,17 @@ html {
 
 html,
 body {
-  min-height: 100dvh;
+  height: 100dvh;
   display: grid;
+  gap: 1em;
   place-items: center;
+}
+
+html {
+  background: #eee;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+body {
 }
